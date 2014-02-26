@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.templates;
 
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.InternalButton;
 
@@ -12,18 +9,21 @@ import edu.wpi.first.wpilibj.buttons.InternalButton;
  * @author skodali
  */
 public class TriggerButton extends InternalButton{
-    Joystick joystick;
-    int axisNumber;
-    boolean isRight;
-    public TriggerButton(Joystick joystick, int axisNumber, boolean isRight){
+    
+    
+    private final Joystick joystick;
+    private final int axisNumber;
+    private final Hand hand;
+    
+    public TriggerButton(Joystick joystick, int axisNumber, Hand hand){
         this.joystick = joystick;
         this.axisNumber = axisNumber;
-        this.isRight = isRight;
+        this.hand = hand;
     }
      
     
     public boolean get(){
-        if(isRight == true){
+        if(hand == Hand.kLeft){
             return joystick.getRawAxis(axisNumber) > 0.5;
         }else{
             return joystick.getRawAxis(axisNumber) < -0.5;

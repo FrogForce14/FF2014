@@ -55,7 +55,7 @@ public class DriveStraightCommand extends Command implements PIDSource, PIDOutpu
     /**
      * Parameters that control the PID controller.
      */
-    private double P = .05, I = 0,  D = 0, straighteningK = 0.000007, distance;
+    private double P = .05, I = 0,  D = 0, straighteningK = -0.0000001, distance;
     
     /**                                             
      * PID controller. 
@@ -71,7 +71,8 @@ public class DriveStraightCommand extends Command implements PIDSource, PIDOutpu
         Drivetrain.startEncoders();  
         pid.reset();
         pid.setSetpoint(distance);
-        pid.enable();  }
+        pid.enable();  
+        }
     
     /**
      * Called repeatedly when this Command is scheduled to run.

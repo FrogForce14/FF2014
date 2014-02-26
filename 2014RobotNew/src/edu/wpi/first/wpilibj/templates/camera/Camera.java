@@ -28,7 +28,7 @@ public class Camera extends Subsystem {
     }
     
    
-     public class Scores {
+     public static class Scores {
         double rectangularity;
         double aspectRatioVertical;
         double aspectRatioHorizontal;
@@ -43,18 +43,18 @@ public class Camera extends Subsystem {
 		double tapeWidthScore;
 		double verticalScore;
     };
-    double ratioToScore(double ratio)
+    private static double ratioToScore(double ratio)
 	{
 		return (Math.max(0, Math.min(100*(1-Math.abs(1-ratio)), 100)));
 	}
-    double scoreRectangularity(ParticleAnalysisReport report){
+    private static double scoreRectangularity(ParticleAnalysisReport report){
             if(report.boundingRectWidth*report.boundingRectHeight !=0){
                     return 100*report.particleArea/(report.boundingRectWidth*report.boundingRectHeight);
             } else {
                     return 0;
             }	
     }
-     double computeDistance (BinaryImage image, ParticleAnalysisReport report, int particleNumber) throws NIVisionException {
+     private static double computeDistance (BinaryImage image, ParticleAnalysisReport report, int particleNumber) throws NIVisionException {
             double rectLong, height;
             int targetHeight;
 
@@ -66,7 +66,7 @@ public class Camera extends Subsystem {
 
             return Y_IMAGE_RES * targetHeight / (height * 12 * 2 * Math.tan(VIEW_ANGLE*Math.PI/(180*2)));
     }
-     public double scoreAspectRatio(BinaryImage image, ParticleAnalysisReport report, int particleNumber, boolean vertical) throws NIVisionException
+     public static double scoreAspectRatio(BinaryImage image, ParticleAnalysisReport report, int particleNumber, boolean vertical) throws NIVisionException
     {
         double rectLong, rectShort, aspectRatio, idealAspectRatio;
 
@@ -84,14 +84,14 @@ public class Camera extends Subsystem {
         }
 	return aspectRatio;
     }
-     boolean scoreCompare(Scores scores, boolean vertical){
+     private static boolean scoreCompare(Scores scores, boolean vertical){
 	boolean isTarget = true;
 
 	isTarget &= scores.rectangularity > RECTANGULARITY_LIMIT;
 	if(vertical){
-            isTarget &= scores.aspectRatioVertical > ASPECT_RATIO_LIMIT;
+            isTarget &= scores.aspectRatioVertical > VERT_ASPECT_RATIO_LIMIT;
 	} else {
-            isTarget &= scores.aspectRatioHorizontal > ASPECT_RATIO_LIMIT;
+            isTarget &= scores.aspectRatioHorizontal > HORIZ_ASPECT_RATIO_LIMIT;
 	}
 
 	return isTarget;
@@ -99,72 +99,98 @@ public class Camera extends Subsystem {
     
     private Camera(){}
     
-    final int Y_IMAGE_RES = 480;		//X Image resolution in pixels, should be 120, 240 or 480 //this is just the size of the camera picture
-    final double VIEW_ANGLE = 49;		//Axis M1013 
+    final static int Y_IMAGE_RES = 480;		//X Image resolution in pixels, should be 120, 240 or 480 //this is just the size of the camera picture
+    final static double VIEW_ANGLE = 49;		//Axis M1013 
     //final double VIEW_ANGLE = 41.7;		//Axis 206 camera
     //final double VIEW_ANGLE = 37.4;  //Axis M1011 camera
-    final double PI = 3.141592653; //obvious
+    final static double PI = 3.141592653; //obvious
 
     //Score limits used for target identification
-    final int  RECTANGULARITY_LIMIT = 40; 
-    final int ASPECT_RATIO_LIMIT = 55;  //aspect ratio limit. let me see how that is calculated
+    final static int  RECTANGULARITY_LIMIT = 40;
+    final static int HORIZ_ASPECT_RATIO_LIMIT = 55;
+    final static int VERT_ASPECT_RATIO_LIMIT = 35;//aspect ratio limit. let me see how that is calculated
 
     //Score limits used for hot target determination
-    final int TAPE_WIDTH_LIMIT = 50;
-    final int  VERTICAL_SCORE_LIMIT = 50;   //these are more limits
-    final int LR_SCORE_LIMIT = 50;
+    final static int TAPE_WIDTH_LIMIT = 50;
+    final static int  VERTICAL_SCORE_LIMIT = 50;   //these are more limits
+    final static int LR_SCORE_LIMIT = 50;
 
     //Minimum area of particles to be considered
-    final int AREA_MINIMUM = 150;
+    final static int AREA_MINIMUM = 150;
     //Minimum width
-    final int WIDTH_MINIMUM = 40;
+    final static int WIDTH_MINIMUM = 40;
 
     //Maximum number of particles to process
-    final int MAX_PARTICLES = 8;
+    final static int MAX_PARTICLES = 8;
 
     
    
     
-    AxisCamera camera =  AxisCamera.getInstance();          // the axis camera object (connected to the switch) this is obvious
-    CriteriaCollection cc = new CriteriaCollection();
-    CriteriaCollection ccc = new CriteriaCollection();
-    BinaryImage thresholdImage;
+    //static AxisCamera camera =  AxisCamera.getInstance();          // the axis camera object (connected to the switch) this is obvious
+    static CriteriaCollection cc = new CriteriaCollection();
+    static CriteriaCollection ccc = new CriteriaCollection();
     
-    ColorImage image; // next 2 lines read image from flash on cRIO// the criteria for doing the particle filter operation 
+    static ColorImage image; // next 2 lines read image from flash on cRIO// the criteria for doing the particle filter operation 
     
     static TargetReport target = new TargetReport(); 
-    public void getImage(){  
+    public static void getImage(){  
 	int verticalTargets[] = new int[MAX_PARTICLES];    //yeah, each particle/blob has an identifying integer, like a memory address. these arrays hold them
 	int horizontalTargets[] = new int[MAX_PARTICLES];    
 	int verticalTargetCount, horizontalTargetCount;
         cc.addCriteria(NIVision.MeasurementType.IMAQ_MT_AREA, AREA_MINIMUM, 65535, false); 
-        ccc.addCriteria(NIVision.MeasurementType.IMAQ_MT_BOUNDING_RECT_WIDTH, WIDTH_MINIMUM, 65535, false); 
+        ccc.addCriteria(NIVision.MeasurementType.IMAQ_MT_BOUNDING_RECT_WIDTH, WIDTH_MINIMUM, 65535, false);
+        boolean connected = false;
+        int trys = 0;
+        while(!connected){
+                try {
+                    //System.out.println("get Image");
+                    Thread.sleep(100);
+                    trys++;
+                    //camera.getImage();
+                    connected = true;
+           // }  catch (NIVisionException ex) {
+             //   ex.printStackTrace();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            //} catch (AxisCameraException ex) {
+                    System.out.println("waiting for camera");
+                    if(trys >= 10){
+                        System.out.println("out of time");
+                        target.Hot = false;
+                        return;
+                    }
+                }
+        }
         try{                        
                 
-                image = camera.getImage();		// get the sample image from the cRIO flash
-                image.write("/test.png");
-                thresholdImage = image.thresholdHSL(118, 255, 100, 255, 40, 255);   // keep only green objects
-                thresholdImage.write("/testBin.bmp");
-                
+                 //ColorImage colorImage = camera.getImage();     // comment if using stored images
+                //colorImage.write("/testImage.png");
+                ColorImage colorImage;                           // next 2 lines read image from flash on cRIO
+                colorImage = new RGBImage("/testImage.png");		// get the sample image from the cRIO flash
+                BinaryImage binaryImage = colorImage.thresholdHSV(45, 160, 100, 255, 40, 255);   // keep only green objects
+                binaryImage.write("/BImage.png");
                 //thresholdImage.write("/threshold.bmp");
-                BinaryImage filteredImage = thresholdImage.particleFilter(cc);
-                //BinaryImage filteredImage1 = filteredImage.particleFilter(ccc);
-                filteredImage.write("/testFilter.bmp");
+                
+                
+                
+                binaryImage = binaryImage.convexHull(true);
+                binaryImage.write("/CHImage.png");
+                binaryImage = binaryImage.particleFilter(cc);           // filter out small particles
+                binaryImage.write("/FImage.png");
                  //iterate through each particle and score to see if it is a target
-                Scores scores[] = new Scores[filteredImage.getNumberParticles()];
+                Scores scores[] = new Scores[binaryImage.getNumberParticles()];
                 horizontalTargetCount = verticalTargetCount = 0;
                 
-                if(filteredImage.getNumberParticles() > 0)
+                if(binaryImage.getNumberParticles() > 0)
                 {
-			for (int i = 0; i < MAX_PARTICLES && i < filteredImage.getNumberParticles(); i++) {
-			ParticleAnalysisReport report = filteredImage.getParticleAnalysisReport(i);
-                        System.out.println(report);
+			for (int i = 0; i < MAX_PARTICLES && i < binaryImage.getNumberParticles(); i++) {
+			ParticleAnalysisReport report = binaryImage.getParticleAnalysisReport(i);
                         scores[i] = new Scores();
 					
 			//Score each particle on rectangularity and aspect ratio
 			scores[i].rectangularity = scoreRectangularity(report);
-			scores[i].aspectRatioVertical = scoreAspectRatio(filteredImage, report, i, true);
-			scores[i].aspectRatioHorizontal = scoreAspectRatio(filteredImage, report, i, false);			
+			scores[i].aspectRatioVertical = scoreAspectRatio(binaryImage, report, i, true);
+			scores[i].aspectRatioHorizontal = scoreAspectRatio(binaryImage, report, i, false);			
 					
 			//Check if the particle is a horizontal target, if not, check if it's a vertical target
 			if(scoreCompare(scores[i], false))
@@ -186,16 +212,16 @@ public class Camera extends Subsystem {
 			target.verticalIndex = verticalTargets[0];
                         for (int i = 0; i < verticalTargetCount; i++)
 			{
-				ParticleAnalysisReport verticalReport = filteredImage.getParticleAnalysisReport(verticalTargets[i]);
+				ParticleAnalysisReport verticalReport = binaryImage.getParticleAnalysisReport(verticalTargets[i]);
 				for (int j = 0; j < horizontalTargetCount; j++)
 				{
-                                    ParticleAnalysisReport horizontalReport = filteredImage.getParticleAnalysisReport(horizontalTargets[j]);
+                                    ParticleAnalysisReport horizontalReport = binaryImage.getParticleAnalysisReport(horizontalTargets[j]);
                                     double horizWidth, horizHeight, vertWidth, leftScore, rightScore, tapeWidthScore, verticalScore, total;
 	
                                     //Measure equivalent rectangle sides for use in score calculation
-                                    horizWidth = NIVision.MeasureParticle(filteredImage.image, horizontalTargets[j], false, NIVision.MeasurementType.IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE);
-                                    vertWidth = NIVision.MeasureParticle(filteredImage.image, verticalTargets[i], false, NIVision.MeasurementType.IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE);
-                                    horizHeight = NIVision.MeasureParticle(filteredImage.image, horizontalTargets[j], false, NIVision.MeasurementType.IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE);
+                                    horizWidth = NIVision.MeasureParticle(binaryImage.image, horizontalTargets[j], false, NIVision.MeasurementType.IMAQ_MT_EQUIVALENT_RECT_LONG_SIDE);
+                                    vertWidth = NIVision.MeasureParticle(binaryImage.image, verticalTargets[i], false, NIVision.MeasurementType.IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE);
+                                    horizHeight = NIVision.MeasureParticle(binaryImage.image, horizontalTargets[j], false, NIVision.MeasurementType.IMAQ_MT_EQUIVALENT_RECT_SHORT_SIDE);
 						
                                     //Determine if the horizontal target is in the expected location to the left of the vertical target
                                     leftScore = ratioToScore(1.2*(verticalReport.boundingRectLeft - horizontalReport.center_mass_x)/horizWidth);
@@ -229,8 +255,8 @@ public class Camera extends Subsystem {
                                     //Information about the target is contained in the "target" structure
                                     //To get measurement information such as sizes or locations use the
                                     //horizontal or vertical index to get the particle report as shown below
-                                    ParticleAnalysisReport distanceReport = filteredImage.getParticleAnalysisReport(target.verticalIndex);
-                                    double distance = computeDistance(filteredImage, distanceReport, target.verticalIndex);
+                                    ParticleAnalysisReport distanceReport = binaryImage.getParticleAnalysisReport(target.verticalIndex);
+                                    double distance = computeDistance(binaryImage, distanceReport, target.verticalIndex);
                                     if(target.Hot)
                                     {
                                             System.out.println("Hot target located");
@@ -239,7 +265,6 @@ public class Camera extends Subsystem {
                                             System.out.println("No hot target present");
                                             System.out.println("Distance: " + distance);
                                     }
-                                    this.distance = distance;
                             }
                 }
 
@@ -248,9 +273,8 @@ public class Camera extends Subsystem {
                  * of C data structures. Not calling free() will cause the memory to accumulate over
                  * each pass of this loop.
                  */
-                filteredImage.free();
-                thresholdImage.free();
-                image.free();
+                colorImage.free();
+                binaryImage.free();
                         
                 
               
@@ -264,28 +288,29 @@ public class Camera extends Subsystem {
             
             System.out.println(ex.toString());
             
-        }catch(AxisCameraException ex){
+        //}catch(AxisCameraException ex){
             
             System.out.println(ex.toString());
         }
     }
 
-    public boolean hotOrNot(TargetReport target)
+    public static boolean hotOrNot(TargetReport target)
 	{
                 
-                getImage();
 		boolean isHot = true;
 		
 		isHot &= target.tapeWidthScore >= TAPE_WIDTH_LIMIT;
 		isHot &= target.verticalScore >= VERTICAL_SCORE_LIMIT;
 		isHot &= (target.leftScore > LR_SCORE_LIMIT) | (target.rightScore > LR_SCORE_LIMIT);
 		
-                this.hotOrNot = isHot;
+                
 		return isHot;
 	}
     
     
+    
     public static boolean isHot(){
+        getImage();
         return target.Hot;
     }
     
@@ -297,6 +322,7 @@ public class Camera extends Subsystem {
         public boolean isDone = false,
                        isHot;
         public void run(){
+            
             isDone = false;
             this.isHot = Camera.isHot();
             isDone = true;

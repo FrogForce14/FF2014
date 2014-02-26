@@ -40,9 +40,9 @@ public class Drivetrain extends Subsystem {
         rightEncoder = new Encoder(RobotMap.DRIVETRAIN_RIGHT_ENCODER_CHANNEL_A,
                                     RobotMap.DRIVETRAIN_RIGHT_ENCODER_CHANNEL_B, false,
                                     Encoder.EncodingType.k4X);
-        leftEncoder.setDistancePerPulse(1d/250d);
+        leftEncoder.setDistancePerPulse(1d/(250d));
         leftEncoder.setMaxPeriod(1);
-        rightEncoder.setDistancePerPulse(1d/250d);//make sure you update these.
+        rightEncoder.setDistancePerPulse(1d/(250d));//make sure you update these.
         rightEncoder.setMaxPeriod(1); 
         shifter = new DoubleSolenoid(RobotMap.SHIFTER_SOLENOID_A, RobotMap.SHIFTER_SOLENOID_B);
         startEncoders();
@@ -50,6 +50,7 @@ public class Drivetrain extends Subsystem {
         //LiveWindow.addActuator("Drivetrain", "Right Motors", rightMotors);
 //        LiveWindow.addSensor("Drivetrain", "Left Encoder", leftEncoder);
 //        LiveWindow.addSensor("Drivetrain", "Right Encoder", rightEncoder); 
+        drive.setSafetyEnabled(false);
     }
     
     
@@ -67,7 +68,6 @@ public class Drivetrain extends Subsystem {
         
         setMotors(leftInput, rightInput);
         
-       
     }
     
     
@@ -78,6 +78,10 @@ public class Drivetrain extends Subsystem {
     
     public static void drive(double speed, double curve){
         drive.drive(speed, curve);
+    }
+    
+    public static void arcadeDrive(double speed, double curve){
+        drive.arcadeDrive(speed, curve);
     }
     
     public static Drivetrain getInstance(){
@@ -121,7 +125,7 @@ public class Drivetrain extends Subsystem {
      * Sets the accumulated distance to zero.
      */
     public static void resetEncoders(){
-        leftEncoder.reset();
+        leftEncoder.reset(); 
         rightEncoder.reset();
     }
     
@@ -136,10 +140,10 @@ public class Drivetrain extends Subsystem {
     }
     
     public static void highGear(){
-        shifter.set(DoubleSolenoid.Value.kReverse);
+        shifter.set(DoubleSolenoid.Value.kForward);
         
     }
     public static void lowGear(){
-        shifter.set(DoubleSolenoid.Value.kForward);
+        shifter.set(DoubleSolenoid.Value.kReverse);
     }
 } 

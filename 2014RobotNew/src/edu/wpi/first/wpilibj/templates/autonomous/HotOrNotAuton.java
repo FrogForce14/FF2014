@@ -1,30 +1,22 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-package edu.wpi.first.wpilibj.templates.camera;
+package edu.wpi.first.wpilibj.templates.autonomous;
 
 import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.templates.autonomous.OneBallCommandGroup;
+import edu.wpi.first.wpilibj.templates.camera.Camera;
 import edu.wpi.first.wpilibj.templates.camera.Camera.CameraRunnable;
 
 /**
  *
  * @author skodal
  */
-public class HotOrNot extends Command {
+public class HotOrNotAuton extends Command {
     CameraRunnable cameraRunnable = new CameraRunnable();
     Thread camera;
-    //change in WaitCommandGroup as well.
     
-    public HotOrNot() {
-        // Use requires() here to declare subsystem dependencies
-        // eg. requires(chassis);
+    public HotOrNotAuton() {
         requires(Camera.getInstance());
         
     }
 
-    // Called just before this Command runs the first time
     protected void initialize() {
         camera = new Thread(cameraRunnable);
         camera.start();
@@ -38,11 +30,11 @@ public class HotOrNot extends Command {
             if(cameraRunnable.isHot){
                 //(new OneBallCommandGroup()).start();
                 System.out.println("SOOO HOOOOOT");
-                cancel();
+                Mode.AUTON_PRE_SHOT.addCommand(new HOTCommandGroup());
             }else{
                 //(new WaitThenShootCommandGroup()).start();
                 System.out.println("SOOOO NOOOOOT");
-                cancel();
+                Mode.AUTON_PRE_SHOT.addCommand(new NOTCommandGroup());
             }
           
         }
@@ -60,5 +52,6 @@ public class HotOrNot extends Command {
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     protected void interrupted() {
+        System.out.println("HotOrNotAuton Interrupted");
     }
 }

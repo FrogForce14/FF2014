@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package edu.wpi.first.wpilibj.templates.armAngle;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -30,7 +26,7 @@ public class Angler extends Subsystem implements PIDSource, PIDOutput{
         public static final int LOW_SHOT_VAL = 1;
         public static final double LOW_SHOT_ANGLE = 1310;
         public static final int HIGH_SHOT_VAL = 2;
-        public static final double HIGH_SHOT_ANGLE = 990;
+        public static final double HIGH_SHOT_ANGLE = 770;
         public static final int STRAIGHT_UP_VAL = 3;
         public static final double STRAIGHT_UP_ANGLE = 0;
         
@@ -66,7 +62,7 @@ public class Angler extends Subsystem implements PIDSource, PIDOutput{
         encoder.setDistancePerPulse(360/(ENCODER_CPR/*GEARBOX_RATIO*/*CHAIN_RATIO));
         encoder.setMaxPeriod(1/*seconds*/);    
         controller.setOutputRange(-0.3, 0.3);
-        controller.setAbsoluteTolerance(20/*degrees, should be*/);//tuen this
+        controller.setAbsoluteTolerance(10/*degrees, should be*/);//tuen this
         SmartDashboard.putData("ANGLER PID", controller);
     }
     
@@ -77,9 +73,9 @@ public class Angler extends Subsystem implements PIDSource, PIDOutput{
     
     public static void setSpeed(double speed){
         SmartDashboard.putNumber("Angle speed", -speed);
-        if((isLowerLimitSwitchPressed() && speed < 0)/*||(isUpperLimitSwitchPressed()  && speed > 0)*/){
+       /* if(speed < 0 && (isLowerLimitSwitchPressed())/*||(isUpperLimitSwitchPressed()  && speed > 0)){
             speed = 0;
-        }
+        }*/
         
         speed = -speed;
         
@@ -150,8 +146,5 @@ public class Angler extends Subsystem implements PIDSource, PIDOutput{
 
     public void initDefaultCommand() {
         setDefaultCommand(new ManualAnglerCommand());
-        
-        // Set the default command for a subsystem here.
-        //setDefaultCommand(new MySpecialCommand());
     }
 }

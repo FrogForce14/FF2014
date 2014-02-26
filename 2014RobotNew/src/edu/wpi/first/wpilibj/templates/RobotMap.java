@@ -23,8 +23,8 @@ public class RobotMap {
                             WINCH_SOLENOID = 5,
                             WINCH_SAFETY_SOLENOID = 6,
                             WINCH_LIMIT_SWITCH = 1,
-                            ARM_ANGLE_MOTOR = 8,
-                            WINCH_MOTOR = 6,
+                            ARM_ANGLE_MOTOR = 5,
+                            WINCH_MOTOR = 8,
                             DRIVETRAIN_LEFT_ENCODER_CHANNEL_A = 4,
                             DRIVETRAIN_LEFT_ENCODER_CHANNEL_B = 5,
                             DRIVETRAIN_RIGHT_ENCODER_CHANNEL_A = 6,
@@ -42,6 +42,6 @@ public class RobotMap {
                             VERTICAL_CLAW_SOLENOID_B = 4,
                             HORIZONTAL_CLAW_SOLENOID_A = 7,
                             HORIZONTAL_CLAW_SOLENOID_B = 8,
-                            ROLLER_RELAY = 3;
+                            ROLLER_RELAY = 8;
                             
 }

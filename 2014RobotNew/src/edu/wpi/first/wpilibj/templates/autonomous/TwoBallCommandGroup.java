@@ -7,6 +7,7 @@ package edu.wpi.first.wpilibj.templates.autonomous;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 import edu.wpi.first.wpilibj.templates.armAngle.Angler.Angle;
+import edu.wpi.first.wpilibj.templates.armAngle.CalibrateCommandGroup;
 import edu.wpi.first.wpilibj.templates.armAngle.GoToAngleCommand;
 import edu.wpi.first.wpilibj.templates.drivetrain.DriveStraightCommand;
 import edu.wpi.first.wpilibj.templates.roller.Roller.Direction;
@@ -22,7 +23,7 @@ import edu.wpi.first.wpilibj.templates.winch.FireCommandGroup;
  */
 public class TwoBallCommandGroup extends CommandGroup {
     
-    int rotations = 17;
+    int rotations = 5;
     
     public TwoBallCommandGroup() {
         // Add Commands here:
@@ -42,21 +43,22 @@ public class TwoBallCommandGroup extends CommandGroup {
         // a CommandGroup containing them would require both the chassis and the
         // arm.
         
+    addSequential(new CalibrateCommandGroup());
     addSequential(new GoToAngleCommand(Angle.LOW_SHOT));
     addSequential(new SetVerticalClawCommand(Position.OPEN));
     addSequential(new FireCommandGroup());
     addSequential(new WaitCommand(.5));
-    addSequential(new SetVerticalClawCommand(Position.CLOSE));
+    addSequential(new SetVerticalClawCommand(Position.CLOSED));
     addSequential(new GoToAngleCommand(Angle.PICKUP));
     addSequential(new SetRollerCommand(Direction.IN));
-    addSequential(new DriveStraightCommand(rotations*2));
+    addSequential(new DriveStraightCommand(-rotations*2));
     addSequential(new WaitCommand(2));
     addSequential(new SetRollerCommand(Direction.OFF));
-    addSequential(new DriveStraightCommand(-rotations * 0.8));
+    addSequential(new DriveStraightCommand(rotations * 0.8));
     addSequential(new GoToAngleCommand(Angle.HIGH_SHOT)); 
     addSequential(new SetVerticalClawCommand(Position.OPEN));
     addSequential(new FireCommandGroup());
     addSequential(new WaitCommand(.5));
-    addSequential(new SetVerticalClawCommand(Position.CLOSE));
+    addSequential(new SetVerticalClawCommand(Position.CLOSED));
     }
 }

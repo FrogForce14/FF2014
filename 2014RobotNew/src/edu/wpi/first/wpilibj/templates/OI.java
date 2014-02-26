@@ -1,6 +1,8 @@
 
 package edu.wpi.first.wpilibj.templates;
 
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.buttons.JoystickButton;
 import edu.wpi.first.wpilibj.templates.armAngle.Angler.Angle;
@@ -21,67 +23,67 @@ import edu.wpi.first.wpilibj.templates.winch.PullBackWinchWithPneumaticCommandGr
  * interface to the commands and command groups that allow control of the robot.
  */
 public class OI {
-    //// CREATING BUTTONS
-    // One type of button is a joystick button which is any button on a joystick.
-    // You create one by telling it which joystick it's on and which button
-    // number it is.
-    // Joystick stick = new Joystick(port);
-    // Button button = new JoystickButton(stick, buttonNumber);
+//1: A
+//2: B
+//3: X
+//4: Y
+//5: Left Bumper
+//6: Right Bumper
+//7: Back
+//8: Start
+//9: Left Joystick
+//10: Right Joystick
+//
+//The axis on the controller follow this mapping
+//(all output is between -1 and 1)
+//1: Left Stick X Axis
+//-Left:Negative ; Right: Positive
+//2: Left Stick Y Axis
+//-Up: Negative ; Down: Positive
+//3: Triggers
+//-Left: Positive ; Right: Negative
+//4: Right Stick X Axis
+//-Left: Negative ; Right: Positive
+//5: Right Stick Y Axis
+//-Up: Negative ; Down: Positive
+    private static final int A = 1,
+                            B = 2,
+                            X = 3,
+                            Y = 4,
+                            LB = 5,
+                            RB = 6,
+                            BACK = 7,
+                            START = 8,
+                            LJOY = 9,
+                            RJOY = 10,
+                            LEFT_X = 1,
+                            LEFT_Y = 2,
+                            TRIGGERS = 3,
+                            RIGHT_X = 4,
+                            RIGHT_Y = 5;
     
-    // Another type of button you can create is a DigitalIOButton, which is
-    // a button or switch hooked up to the cypress module. These are useful if
-    // you want to build a customized operator interface.
-    // Button button = new DigitalIOButton(1);
+    public static final Joystick leftJoystick = new Joystick(1),
+                                    rightJoystick = new Joystick(2),
+                                    operatorJoystick = new Joystick(3);
     
-    // There are a few additional built in buttons you can use. Additionally,
-    // by subclassing Button you can create custom triggers and bind those to
-    // commands the same as any other Button.
-    
-    //// TRIGGERING COMMANDS WITH BUTTONS
-    // Once you have a button, it's trivial to bind it to a button in one of
-    // three ways:
-    
-    // Start the command when the button is pressed and let it run the command
-    // until it is finished as determined by it's isFinished method.
-    // button.whenPressed(new ExampleCommand());
-    
-    // Run the command while the button is being held down and interrupt it once
-    // the button is released.
-    // button.whileHeld(new ExampleCommand());
-    
-    // Start the command when the button is released  and let it run the command
-    // until it is finished as determined by it's isFinished method.
-    // button.whenReleased(new ExampleCommand());
-    private static final int LEFT_X_AXIS = 6,
-                            RIGHT_Y_AXIS = 5,
-                            TRIGGER = 3;
-    
-    private static final Joystick leftJoystick = new Joystick(1),
-            rightJoystick = new Joystick(2),
-            operatorJoystick = new Joystick(3);
-    
-    private static final TriggerButton rightTrigger = new TriggerButton(operatorJoystick, TRIGGER, true),
-                                            leftTrigger = new TriggerButton(operatorJoystick, TRIGGER, false);
+    public static final TriggerButton leftTrigger = new TriggerButton(operatorJoystick, TRIGGERS, Hand.kLeft),
+                                            rightTrigger = new TriggerButton(operatorJoystick, TRIGGERS, Hand.kRight);
     
     
-    private static final JoystickButton 
-                                        highShotButton = new JoystickButton(operatorJoystick, 4),
-                                        lowShotButton = new JoystickButton(operatorJoystick, 2),
-                                        pickupButton = new JoystickButton(operatorJoystick, 1),
-                                        //7
-                                        //rollerOff = new JoystickButton(operatorJoystick, 3),
-                                        verticalClawOpen = new JoystickButton(operatorJoystick, 6),
-                                        verticalClawClose = new JoystickButton(operatorJoystick, 5),
-                                        horizontalClawOpen = new JoystickButton(operatorJoystick, 9),
-                                        horizontalClawClose = new JoystickButton(operatorJoystick, 10),
-                                        calibrate = new JoystickButton(operatorJoystick, 3),
+    public static final JoystickButton pickupButton = new JoystickButton(operatorJoystick, A),
+                                        lowShotButton = new JoystickButton(operatorJoystick, B),
+                                        calibrate = new JoystickButton(operatorJoystick, X),
+                                        highShotButton = new JoystickButton(operatorJoystick, Y),
+                                        verticalClawClose = new JoystickButton(operatorJoystick, LB),
+                                        verticalClawOpen = new JoystickButton(operatorJoystick, RB),
+                                        rollerOut = new JoystickButton(operatorJoystick, BACK),
+                                        rollerIn = new JoystickButton(operatorJoystick, START),
+                                        horizontalClawOpen = new JoystickButton(operatorJoystick, LJOY),
+                                        horizontalClawClose = new JoystickButton(operatorJoystick, RJOY),
     
-                                        shiftHigh = new JoystickButton(rightJoystick, 6),
-                                        
+                                        shiftHigh = new JoystickButton(rightJoystick, 6),                                        
                                         shiftLow = new JoystickButton(rightJoystick, 4);
     
-    public static final JoystickButton rollerIn = new JoystickButton(operatorJoystick, 8),
-                                        rollerOut = new JoystickButton(operatorJoystick, 7);
      
     public static final double ANGLE_SENSITIVITY = .5,
                                 DRIVE_SENSITIVITY = .5;
@@ -98,12 +100,12 @@ public class OI {
     
     public static double getRightInput(){
         double input = rightJoystick.getY(), output = scale(input, DRIVE_SENSITIVITY);
-        return input;
+        return output;
     }
     
     
     public static double getAngleInput(){
-        double output = -scale(operatorJoystick.getRawAxis(RIGHT_Y_AXIS), ANGLE_SENSITIVITY)*0.3;
+        double output = -scale(operatorJoystick.getRawAxis(RIGHT_Y), ANGLE_SENSITIVITY)*0.667;
         return output;
     }
     
@@ -121,17 +123,17 @@ public class OI {
         rollerOut.whenPressed(new SetRollerCommand(Direction.OUT));
         
         verticalClawOpen.whenPressed(new SetVerticalClawCommand(Position.OPEN));
-        verticalClawClose.whenPressed(new SetVerticalClawCommand(Position.CLOSE));
+        verticalClawClose.whenPressed(new SetVerticalClawCommand(Position.CLOSED));
         
         horizontalClawOpen.whenPressed(new SetHorizontalClawCommand(Position.OPEN));
-        horizontalClawClose.whenPressed(new SetHorizontalClawCommand(Position.CLOSE));
+        horizontalClawClose.whenPressed(new SetHorizontalClawCommand(Position.CLOSED));
         
         shiftHigh.whenPressed(new ShifterHighGearCommand());
         shiftLow.whenPressed(new ShifterLowGearCommand());
         
         
-        leftTrigger.whenPressed(new PullBackWinchWithPneumaticCommandGroup());
-        rightTrigger.whenPressed(new FireCommandGroup());
+        rightTrigger.whenPressed(new PullBackWinchWithPneumaticCommandGroup());
+        leftTrigger.whenPressed(new FireCommandGroup());
         
         calibrate.whenPressed(new CalibrateCommandGroup());
         

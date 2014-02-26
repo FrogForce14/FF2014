@@ -29,7 +29,7 @@ public class Claw extends Subsystem {
         }
         
         public final static Position OPEN = new Position(OPEN_VAL, OPEN_SOLENOID_COMMAND);
-        public final static Position CLOSE = new Position(CLOSE_VAL, CLOSE_SOLENOID_COMMAND);
+        public final static Position CLOSED = new Position(CLOSE_VAL, CLOSE_SOLENOID_COMMAND);
         
     }
     

@@ -10,4 +10,4 @@ public class DisengageWinchCommand extends InstantaneousCommand {
     protected void action(){
         Winch.disengageWinch();
     }
-}
+} 

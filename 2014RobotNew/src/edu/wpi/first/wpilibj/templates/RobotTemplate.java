@@ -18,9 +18,12 @@ import edu.wpi.first.wpilibj.templates.armAngle.Angler.Angle;
 import edu.wpi.first.wpilibj.templates.armAngle.CalibrateCommandGroup;
 import edu.wpi.first.wpilibj.templates.armAngle.GoToAngleCommand;
 import edu.wpi.first.wpilibj.templates.armAngle.ManualAnglerCommand;
-import edu.wpi.first.wpilibj.templates.autonomous.OneBallCommandGroup;
+import edu.wpi.first.wpilibj.templates.autonomous.AutonDriveBackCommand;
+import edu.wpi.first.wpilibj.templates.autonomous.DriveNoWhereCommand;
+import edu.wpi.first.wpilibj.templates.autonomous.HOTCommandGroup;
 import edu.wpi.first.wpilibj.templates.autonomous.TwoBallCommandGroup;
-import edu.wpi.first.wpilibj.templates.camera.HotOrNot;
+import edu.wpi.first.wpilibj.templates.autonomous.HotOrNotAuton;
+import edu.wpi.first.wpilibj.templates.autonomous.Mode;
 import edu.wpi.first.wpilibj.templates.claw.Claw;
 import edu.wpi.first.wpilibj.templates.compressor.CompressorStartCommand;
 import edu.wpi.first.wpilibj.templates.compressor.RobotCompressor;
@@ -41,7 +44,7 @@ public class RobotTemplate extends IterativeRobot {
 
     Command calibrateCommand = new CalibrateCommandGroup(); 
     Command lowAngle = new GoToAngleCommand(Angle.LOW_SHOT);
-    Command autonomousCommand1 = new OneBallCommandGroup(); 
+    Command autonomousCommandOneBall = new HOTCommandGroup(); 
     Command autonomousCommand2 = new TwoBallCommandGroup();
     
 
@@ -62,18 +65,20 @@ public class RobotTemplate extends IterativeRobot {
         SmartDashboard.putData("Roller", Roller.getInstance());
         SmartDashboard.putData("Compressor", RobotCompressor.getInstance());
         
+        //Mode.AUTON_PRE_SHOT.addChoice(new HotOrNotAuton(), true);
+        Mode.AUTON_PRE_SHOT.addChoice(new TwoBallCommandGroup(), false);
+        Mode.AUTON_PRE_SHOT.addChoice(new HOTCommandGroup(), false, "Quick, No Camera, 1 Ball");
+        
+        Mode.AUTON_POST_SHOT.addChoice(new DriveNoWhereCommand(), true);
+        Mode.AUTON_POST_SHOT.addChoice(new AutonDriveBackCommand(), false);
+        
+        Mode.TELEOP.addCommand(new ShifterHighGearCommand());
+        Mode.TELEOP.addCommand(new TeleopDriveCommand());
+        Mode.TELEOP.addCommand(new ManualAnglerCommand());
     }
 
     public void autonomousInit() {
-        // schedule the autonomous command (example) 
-        //calibrate.start();
-        (new ShifterHighGearCommand()).start();
-        (new HotOrNot()).start();
-        //testing, delete when done
-        //calibrateCommand.start();
-        //w
-        //autonomousCommand1.start();
-        //lowAngle.start();
+        Mode.changeMode(Mode.AUTON_PRE_SHOT);
     }
 
     /**
@@ -84,15 +89,7 @@ public class RobotTemplate extends IterativeRobot {
     }
 
     public void teleopInit() {
-	// This makes sure that the autonomous stops running when
-        // teleop starts running. If you want the autonomous to 
-        // continue until interrupted by another command, remove
-        // this line or comment it out.
-        //autonomousCommand1.cancel();
-        //do compressor like below
-        (new TeleopDriveCommand()).start();
-        (new ManualAnglerCommand()).start();
-        
+        Mode.changeMode(Mode.TELEOP);        
     }
 
     /**

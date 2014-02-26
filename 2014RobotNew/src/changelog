@@ -1,0 +1,10 @@
+2/16
+    OneBallCommandGroup -> HOTCommandGroup
+    Create NOTCommandGroup with integral wait.
+    Move camera/HotOrNot -> autonomous/HotOrNotAuton
+    Delete WaitThenShootCommandGroup, use NOTCommandGroup in Hot/Not
+    Create Mode system to manage different autonomous commands in an elegant fashion
+    Make RobotTemplate use the Mode System
+    Add Auton Driving
+    Add Auton Claw
+    Add OI Button names
